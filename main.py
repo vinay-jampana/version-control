@@ -2,7 +2,7 @@ import os
 from user import create_user
 
 
-def add_func():
+def init_func():
     cwd = os.getcwd()
     print(cwd)
     if os.path.isdir('./.vcs'):
@@ -20,23 +20,23 @@ def add_func():
     else:
         main_dir = os.path.join(cwd, '.vcs')
         os.mkdir(main_dir)
-        print('yo')
-        create_user()
 
-        # create hidden directory with sub directories of heads, track, objects, users --> user(file)
+        # create objects dir
+
+        obj_dir = os.path.join(cwd, '.vcs/objects')
+        os.mkdir(obj_dir)
+
+        # create tracks dir
+
+        tracks_dir = os.path.join(cwd, '.vcs/tracks')
+        os.mkdir(tracks_dir)
+
+        # create heads dir
 
         heads_dir = os.path.join(cwd, '.vcs/heads')
         os.mkdir(heads_dir)
 
-        # set current user at every login
-
-
-
-        # create a copy of single file present in the location -- take input from user
-        # if there is no file then prompt user to create a file and then run add
-        # create an object an objects folder with file name as hash of some parameter unique to the object
-        # create a head to specify which user is operating
-        # create a track file to notify previous commits -- no initial commits
+        create_user()
 
 
 def commit_func():
