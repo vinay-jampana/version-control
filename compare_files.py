@@ -33,6 +33,7 @@ with open(filepath2) as fp2:
 hashed_lines_list2 = []
 print (len(lines_list2))
 n2 = len(lines_list2)
+
 i = 1
 for i in range(n2):
     hashed_lines_list2.append(base64.b64encode(hashlib.sha1(str.encode(lines_list2[i-1])).digest()))
