@@ -18,12 +18,16 @@ def check_user_exists(username, password):
 
         # check if username is already taken
 
-        if os.path.isfile('.vcs/users/username.txt'):
+        if os.path.isfile('.vcs/users/' + username + '.txt'):
             print('username is already taken')
             create_user()
         else:
-            user_dir = os.path.join(cwd, '.vcs/users')
-            os.mkdir(user_dir)
+
+            if os.path.isdir('.vcs/users'):
+                pass
+            else:
+                user_dir = os.path.join(cwd, '.vcs/users')
+                os.mkdir(user_dir)
 
             # if username == true --> create uid
 
@@ -34,7 +38,7 @@ def check_user_exists(username, password):
 
             create_user_file(username, uid.decode(), password_hash.decode())
 
-            print(uid.decode())
+            # print(uid.decode())
 
 
 def create_user_file(username, uid, password_hash):
@@ -43,24 +47,28 @@ def create_user_file(username, uid, password_hash):
     # line1: username
     # line2: uid
     # line3: passwordHash
+    # line4: selected file
+
+    vcs_file_include = input('Enter The Filename you want to add to version control :     ')
 
     u_file = open('./.vcs/users/' + username + '.txt', 'w')
-    user_details = [username, uid, password_hash]
+    user_details = [username, uid, password_hash, vcs_file_include]
     u_file.write('\n'.join(user_details))
 
-    create_obj_file(username, uid)
+    temp_val = True
+
+    create_obj_file(username, uid, vcs_file_include, temp_val)
 
 
-def create_obj_file(username, uid):
+def create_obj_file(username, uid, vcs_file_include, temp_val):
 
     # file to include
     # check if file is already added <--
 
-    vcs_file_include = input('Enter The Filename you want to add to version control')
     if os.path.isfile(vcs_file_include):
 
         # proceed to create object
-        # set obj_id as aes(username, first few bits of sha1(selected file value))
+        # set obj_id as md5(username, first few bits of sha1(selected file value))
 
         with open(vcs_file_include, encoding='utf8') as f:
             obj_file_value = f.read().strip()
@@ -77,19 +85,18 @@ def create_obj_file(username, uid):
                     of.write(obj_file_value)
 
                 # send the obj_id to track_file to set user_obj
-
-                create_track_file(username, uid, obj_id)
+                create_track_file(username, uid, obj_id, temp_val)
             else:
                 print('Please Try Again')
-                create_obj_file(username, uid)
+                create_obj_file(username, uid, vcs_file_include, temp_val)
 
     else:
         print('No File Present with that filename in the current directory')
-        create_obj_file(username, uid)
+        create_obj_file(username, uid, vcs_file_include, temp_val)
     pass
 
 
-def create_track_file(username, uid, obj_id):
+def create_track_file(username, uid, obj_id, a):
 
     # create a track file specific to a user
 
@@ -97,29 +104,43 @@ def create_track_file(username, uid, obj_id):
         track_file_id = uid
 
         # create append obj_id to track_file
-
-        Path('.vcs/tracks/' + uid + '.txt').touch()
-        with open('.vcs/tracks/' + uid + '.txt', 'w') as tf:
+        if os.path.isfile('.vcs/tracks/' + uid + '.txt'):
+            pass
+        else:
+            Path('.vcs/tracks/' + uid + '.txt').touch()
+        with open('.vcs/tracks/' + uid + '.txt', 'a') as tf:
             tf.write(obj_id)
             tf.write('\n')
 
             # send track_file details to head
 
-            create_head_file(username, uid, track_file_id)
+            if a:
+                val = True
+                create_head_file(username, uid, track_file_id, val)
+            else:
+                val = False
+                create_head_file(username, uid, track_file_id, val)
 
     else:
         print('No Such Directory')
 
 
-def create_head_file(username, uid, track_file_id):
+def create_head_file(username, uid, track_file_id, val):
 
     # line1: username
     # line2: uid
     # line3: track file
 
-    Path('.vcs/heads/' + uid + '.txt').touch()
-    head_file = open('./.vcs/heads/' + uid + '.txt', 'w')
-    head_details = [username, uid, track_file_id]
-    head_file.write('\n'.join(head_details))
+    if os.path.isfile('.vcs/heads/' + uid + '.txt'):
+        pass
+    else:
+        Path('.vcs/heads/' + uid + '.txt').touch()
+
+    if val:
+        head_file = open('./.vcs/heads/' + uid + '.txt', 'a')
+        head_details = [username, uid, track_file_id]
+        head_file.write('\n'.join(head_details))
+    else:
+        pass
 
 
